@@ -1,0 +1,1843 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Levelisasi Numerasi Kelas 2 - Teknologi Masa Depan</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <!-- Tambahkan Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #16213e 100%);
+            color: #e0e6ed;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 92, 246, 0.07) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 40px;
+            font-size: 2.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.7);
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #3b82f6, #8b5cf6, transparent);
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .menu-btn {
+            padding: 25px 15px;
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(51, 65, 85, 0.7) 100%);
+            color: #ffffff;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 15px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            height: 150px;
+        }
+        
+        .menu-btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .menu-btn:hover::before {
+            opacity: 1;
+        }
+        
+        .menu-btn i {
+            font-size: 2.5rem;
+            color: #3b82f6;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+            border-color: rgba(59, 130, 246, 0.6);
+        }
+        
+        .menu-btn:hover i {
+            color: #60a5fa;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.8);
+        }
+        
+        .master-btn {
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.7) 0%, rgba(99, 102, 241, 0.7) 100%);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+        
+        .master-btn i {
+            color: #8b5cf6;
+        }
+        
+        .master-btn:hover {
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.6);
+        }
+        
+        .master-btn:hover i {
+            color: #a78bfa;
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+        }
+        
+        .report-btn {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.7) 0%, rgba(219, 39, 119, 0.7) 100%);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+        
+        .report-btn i {
+            color: #f472b6;
+        }
+        
+        .report-btn:hover {
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+            border-color: rgba(236, 72, 153, 0.6);
+        }
+        
+        .report-btn:hover i {
+            color: #f9a8d4;
+            text-shadow: 0 0 10px rgba(236, 72, 153, 0.8);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .back-btn {
+            background: linear-gradient(135deg, rgba(55, 65, 81, 0.8) 0%, rgba(75, 85, 99, 0.8) 100%);
+            color: #e0e6ed;
+            border: 1px solid rgba(156, 163, 175, 0.3);
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(135deg, rgba(75, 85, 99, 0.8) 0%, rgba(107, 114, 128, 0.8) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        h2 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+        }
+        
+        .table-container {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 10px;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        th {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.8) 0%, rgba(51, 65, 85, 0.8) 100%);
+            color: #60a5fa;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        th:first-child {
+            border-top-left-radius: 10px;
+        }
+        
+        th:last-child {
+            border-top-right-radius: 10px;
+        }
+        
+        tr:last-child td:first-child {
+            border-bottom-left-radius: 10px;
+        }
+        
+        tr:last-child td:last-child {
+            border-bottom-right-radius: 10px;
+        }
+        
+        tr:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        input, select {
+            padding: 10px 15px;
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            color: #e0e6ed;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        
+        select option {
+            background: #1e293b;
+            color: #e0e6ed;
+        }
+        
+        .action-btn {
+            padding: 8px 15px;
+            margin: 3px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .save-btn {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.8) 0%, rgba(5, 150, 105, 0.8) 100%);
+            color: white;
+        }
+        
+        .save-btn:hover {
+            background: linear-gradient(135deg, rgba(5, 150, 105, 0.8) 0%, rgba(4, 120, 87, 0.8) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .print-btn {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.8) 0%, rgba(217, 119, 6, 0.8) 100%);
+            color: white;
+        }
+        
+        .print-btn:hover {
+            background: linear-gradient(135deg, rgba(217, 119, 6, 0.8) 0%, rgba(180, 83, 9, 0.8) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(245, 158, 11, 0.3);
+        }
+        
+        .view-btn {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.8) 0%, rgba(37, 99, 235, 0.8) 100%);
+            color: white;
+        }
+        
+        .view-btn:hover {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(29, 78, 216, 0.8) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .print-section {
+            display: none;
+        }
+        
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .print-section, .print-section * {
+                visibility: visible;
+            }
+            .print-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
+        }
+        
+        .print-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .print-content {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        
+        .print-info {
+            margin-bottom: 15px;
+        }
+        
+        .print-label {
+            font-weight: bold;
+            display: inline-block;
+            width: 150px;
+        }
+        
+        .print-signature {
+            margin-top: 50px;
+            text-align: right;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(10, 14, 39, 0.85);
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(51, 65, 85, 0.95) 100%);
+            margin: 5% auto;
+            padding: 25px;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            width: 85%;
+            max-width: 900px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        
+        .close {
+            color: #94a3b8;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .close:hover {
+            color: #ffffff;
+        }
+        
+        .modal-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.2);
+        }
+        
+        .modal-title {
+            margin: 0;
+            color: #ffffff;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .siswa-count {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+        
+        .siswa-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 5px;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.5);
+        }
+        
+        .siswa-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(59, 130, 246, 0.1);
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: rgba(30, 41, 59, 0.4);
+        }
+        
+        .siswa-item:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .siswa-item:last-child {
+            border-bottom: none;
+        }
+        
+        .siswa-name {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #60a5fa;
+            margin-bottom: 8px;
+        }
+        
+        .siswa-info {
+            display: flex;
+            justify-content: space-between;
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+        
+        .level-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 3px 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* Report Menu Styles */
+        .report-menu {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        .report-menu h3 {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        
+        .report-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .report-option-btn {
+            padding: 15px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.7) 0%, rgba(37, 99, 235, 0.7) 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .report-option-btn i {
+            font-size: 1.8rem;
+        }
+        
+        .report-option-btn:hover {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.8) 0%, rgba(29, 78, 216, 0.8) 100%);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Report Content Styles */
+        .report-content {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            margin-bottom: 30px;
+        }
+        
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .report-title {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .report-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #60a5fa;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+        
+        .percentage-bar {
+            height: 10px;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .percentage-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+        
+        .data-table {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        /* Animasi */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+            }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(59, 130, 246, 0.3);
+            border-radius: 50%;
+            border-top-color: #3b82f6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .menu-btn {
+                height: 120px;
+                font-size: 1.2rem;
+            }
+            
+            .menu-btn i {
+                font-size: 2rem;
+            }
+            
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+                padding: 20px;
+            }
+            
+            .siswa-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .report-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="container">
+        <h1><i class="fas fa-rocket"></i> Levelisasi Numerasi Kelas 2</h1>
+        
+        <!-- Halaman Utama -->
+        <div id="homePage">
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="showKelas('2A')">
+                    <i class="fas fa-users"></i>
+                    <span>Kelas 2A</span>
+                </button>
+                <button class="menu-btn" onclick="showKelas('2B')">
+                    <i class="fas fa-users"></i>
+                    <span>Kelas 2B</span>
+                </button>
+                <button class="menu-btn" onclick="showKelas('2C')">
+                    <i class="fas fa-users"></i>
+                    <span>Kelas 2C</span>
+                </button>
+                <button class="menu-btn" onclick="showKelas('2D')">
+                    <i class="fas fa-users"></i>
+                    <span>Kelas 2D</span>
+                </button>
+                <button class="menu-btn" onclick="showKelas('2E')">
+                    <i class="fas fa-users"></i>
+                    <span>Kelas 2E</span>
+                </button>
+                <button class="menu-btn" onclick="showKelas('2F')">
+                    <i class="fas fa-users"></i>
+                    <span>Kelas 2F</span>
+                </button>
+                <button class="menu-btn master-btn" onclick="showMasterGuru()">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                    <span>Master Data Guru</span>
+                </button>
+                <button class="menu-btn report-btn" onclick="showReportMenu()">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Laporan Progres</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Halaman Kelas -->
+        <div id="kelasPage" class="hidden">
+            <button class="back-btn" onclick="showHome()">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            <h2 id="kelasTitle">Levelisasi Numerasi - Kelas</h2>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Siswa</th>
+                            <th>Level Numerasi</th>
+                            <th>Guru Pembimbing</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="siswaTableBody">
+                        <!-- Isi tabel siswa akan di-generate oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Halaman Master Guru -->
+        <div id="masterGuruPage" class="hidden">
+            <button class="back-btn" onclick="showHome()">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            <h2>Master Data Guru</h2>
+            
+            <div class="table-container">
+                <table class="guru-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nama Guru</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="guruTableBody">
+                        <!-- Isi tabel guru akan di-generate oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Halaman Menu Laporan -->
+        <div id="reportMenuPage" class="hidden">
+            <button class="back-btn" onclick="showHome()">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            
+            <div class="report-menu">
+                <h3>Pilih Jenis Laporan</h3>
+                <div class="report-options">
+                    <button class="report-option-btn" onclick="showReport('kelas')">
+                        <i class="fas fa-school"></i>
+                        <span>Per Kelas</span>
+                    </button>
+                    <button class="report-option-btn" onclick="showReport('level')">
+                        <i class="fas fa-layer-group"></i>
+                        <span>Per Level</span>
+                    </button>
+                    <button class="report-option-btn" onclick="showReport('all')">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Seluruh Kelas</span>
+                    </button>
+                    <button class="report-option-btn" onclick="showReport('guru')">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span>Per Guru</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Halaman Laporan -->
+        <div id="reportPage" class="hidden">
+            <button class="back-btn" onclick="showReportMenu()">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            
+            <div class="report-content" id="reportContent">
+                <div class="report-header">
+                    <h2 class="report-title" id="reportTitle">Laporan Progres</h2>
+                    <div class="report-actions">
+                        <button class="action-btn print-btn" onclick="exportReportPDF()">
+                            <i class="fas fa-file-pdf"></i> Export PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Statistik akan di-generate oleh JavaScript -->
+                </div>
+                
+                <div class="chart-container">
+                    <canvas id="reportChart"></canvas>
+                </div>
+                
+                <div class="table-container">
+                    <table class="data-table" id="reportTable">
+                        <!-- Tabel data akan di-generate oleh JavaScript -->
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal untuk menampilkan siswa per guru -->
+        <div id="siswaModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h3 class="modal-title">Siswa Bimbingan <span id="guruName"></span> <span class="siswa-count" id="siswaCount">0</span></h3>
+                </div>
+                <div class="siswa-list" id="siswaList">
+                    <!-- Daftar siswa akan di-generate oleh JavaScript -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Section untuk cetak PDF -->
+        <div id="printSection" class="print-section">
+            <div class="print-header">
+                <h1>LAPORAN LEVELISASI NUMERASI</h1>
+                <h2>Tahun Ajaran 2023/2024</h2>
+            </div>
+            
+            <div class="print-content">
+                <div class="print-info">
+                    <span class="print-label">Nama Siswa:</span> <span id="printNamaSiswa"></span>
+                </div>
+                <div class="print-info">
+                    <span class="print-label">Kelas:</span> <span id="printKelas"></span>
+                </div>
+                <div class="print-info">
+                    <span class="print-label">Level Numerasi:</span> <span id="printLevel"></span>
+                </div>
+                <div class="print-info">
+                    <span class="print-label">Guru Pembimbing:</span> <span id="printGuru"></span>
+                </div>
+            </div>
+            
+            <div class="print-signature">
+                <p>Mengetahui,</p>
+                <p>Kepala Sekolah</p>
+                <br><br><br>
+                <p>(_________________________)</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notifikasi -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
+    
+    <script>
+        // Konfigurasi Firebase yang diberikan
+        const firebaseConfig = {
+            apiKey: "AIzaSyA6Rj2dCxpNdsxuK3wQXwRxigezrByVMB8",
+            authDomain: "levelisasi-numerasi.firebaseapp.com",
+            projectId: "levelisasi-numerasi",
+            storageBucket: "levelisasi-numerasi.firebasestorage.app",
+            messagingSenderId: "519372815327",
+            appId: "1:519372815327:web:2b4186bfe47a5d36b4226a"
+        };
+        
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        
+        // Data awal guru
+        let guruData = [
+            {id: 1, nama: 'Pak Ridho'},
+            {id: 2, nama: 'Pak Yusep'},
+            {id: 3, nama: 'Pak Widodo'},
+            {id: 4, nama: 'Pak Chandra'},
+            {id: 5, nama: 'Pak Cipto'},
+            {id: 6, nama: 'Pak Nana'},
+            {id: 7, nama: 'Bu Srimel'},
+            {id: 8, nama: 'Bu Wuri'},
+            {id: 9, nama: 'Bu Zaitun'},
+            {id: 10, nama: 'Bu Lina'},
+            {id: 11, nama: 'Bu Yanti'},
+            {id: 12, nama: 'Bu Nurul'}
+        ];
+        
+        // Data awal siswa
+        let siswaData = {
+            '2A': [],
+            '2B': [],
+            '2C': [],
+            '2D': [],
+            '2E': [],
+            '2F': []
+        };
+        
+        // Inisialisasi data siswa
+        function initSiswaData() {
+            const kelasList = ['2A', '2B', '2C', '2D', '2E', '2F'];
+            
+            kelasList.forEach(kelas => {
+                if (siswaData[kelas].length === 0) {
+                    for (let i = 1; i <= 30; i++) {
+                        siswaData[kelas].push({
+                            id: i,
+                            nama: `Siswa ${kelas}-${i}`,
+                            level: 0,
+                            guruId: 0
+                        });
+                    }
+                }
+            });
+        }
+        
+        // Load data dari Firebase
+        function loadData() {
+            // Tampilkan loading spinner
+            document.getElementById('loading').style.display = 'flex';
+            
+            // Load data guru
+            database.ref('guru').once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        guruData = snapshot.val();
+                    } else {
+                        // Jika data belum ada, simpan data awal
+                        database.ref('guru').set(guruData);
+                    }
+                    
+                    // Load data siswa
+                    return database.ref('siswa').once('value');
+                })
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        siswaData = snapshot.val();
+                    } else {
+                        // Jika data belum ada, inisialisasi dan simpan
+                        initSiswaData();
+                        database.ref('siswa').set(siswaData);
+                    } else {
+                        initSiswaData();
+                    }
+                    
+                    // Sembunyikan loading spinner
+                    document.getElementById('loading').style.display = 'none';
+                })
+                .catch((error) => {
+                    console.error("Error loading data: ", error);
+                    showNotification('Gagal memuat data. Menggunakan data lokal.');
+                    initSiswaData();
+                    document.getElementById('loading').style.display = 'none';
+                });
+        }
+        
+        // Save data ke Firebase
+        function saveData() {
+            // Simpan data guru
+            database.ref('guru').set(guruData)
+                .then(() => {
+                    // Simpan data siswa
+                    return database.ref('siswa').set(siswaData);
+                })
+                .then(() => {
+                    console.log('Data berhasil disimpan ke Firebase');
+                })
+                .catch((error) => {
+                    console.error("Error saving data: ", error);
+                    showNotification('Gagal menyimpan data ke server. Data tersimpan di lokal.');
+                    
+                    // Simpan ke localStorage sebagai fallback
+                    localStorage.setItem('guruData', JSON.stringify(guruData));
+                    localStorage.setItem('siswaData', JSON.stringify(siswaData));
+                });
+        }
+        
+        // Tampilkan notifikasi
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Tampilkan halaman utama
+        function showHome() {
+            document.getElementById('homePage').classList.remove('hidden');
+            document.getElementById('kelasPage').classList.add('hidden');
+            document.getElementById('masterGuruPage').classList.add('hidden');
+            document.getElementById('reportMenuPage').classList.add('hidden');
+            document.getElementById('reportPage').classList.add('hidden');
+        }
+        
+        // Tampilkan halaman kelas
+        function showKelas(kelas) {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('kelasPage').classList.remove('hidden');
+            document.getElementById('masterGuruPage').classList.add('hidden');
+            document.getElementById('reportMenuPage').classList.add('hidden');
+            document.getElementById('reportPage').classList.add('hidden');
+            
+            document.getElementById('kelasTitle').textContent = `Levelisasi Numerasi - Kelas ${kelas}`;
+            renderSiswaTable(kelas);
+        }
+        
+        // Tampilkan halaman master guru
+        function showMasterGuru() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('kelasPage').classList.add('hidden');
+            document.getElementById('masterGuruPage').classList.remove('hidden');
+            document.getElementById('reportMenuPage').classList.add('hidden');
+            document.getElementById('reportPage').classList.add('hidden');
+            
+            renderGuruTable();
+        }
+        
+        // Tampilkan menu laporan
+        function showReportMenu() {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('kelasPage').classList.add('hidden');
+            document.getElementById('masterGuruPage').classList.add('hidden');
+            document.getElementById('reportMenuPage').classList.remove('hidden');
+            document.getElementById('reportPage').classList.add('hidden');
+        }
+        
+        // Tampilkan halaman laporan
+        function showReport(type) {
+            document.getElementById('homePage').classList.add('hidden');
+            document.getElementById('kelasPage').classList.add('hidden');
+            document.getElementById('masterGuruPage').classList.add('hidden');
+            document.getElementById('reportMenuPage').classList.add('hidden');
+            document.getElementById('reportPage').classList.remove('hidden');
+            
+            generateReport(type);
+        }
+        
+        // Render tabel siswa
+        function renderSiswaTable(kelas) {
+            const tbody = document.getElementById('siswaTableBody');
+            tbody.innerHTML = '';
+            
+            siswaData[kelas].forEach(siswa => {
+                const row = document.createElement('tr');
+                
+                // Kolom No
+                const noCell = document.createElement('td');
+                noCell.textContent = siswa.id;
+                row.appendChild(noCell);
+                
+                // Kolom Nama
+                const namaCell = document.createElement('td');
+                namaCell.textContent = siswa.nama;
+                row.appendChild(namaCell);
+                
+                // Kolom Level
+                const levelCell = document.createElement('td');
+                const levelSelect = document.createElement('select');
+                levelSelect.innerHTML = `
+                    <option value="0" ${siswa.level === 0 ? 'selected' : ''}>-- Pilih Level --</option>
+                    <option value="1" ${siswa.level === 1 ? 'selected' : ''}>Level 1</option>
+                    <option value="2" ${siswa.level === 2 ? 'selected' : ''}>Level 2</option>
+                    <option value="3" ${siswa.level === 3 ? 'selected' : ''}>Level 3</option>
+                `;
+                levelCell.appendChild(levelSelect);
+                row.appendChild(levelCell);
+                
+                // Kolom Guru
+                const guruCell = document.createElement('td');
+                const guruSelect = document.createElement('select');
+                guruSelect.innerHTML = `<option value="0">-- Pilih Guru --</option>`;
+                guruData.forEach(guru => {
+                    const selected = siswa.guruId === guru.id ? 'selected' : '';
+                    guruSelect.innerHTML += `<option value="${guru.id}" ${selected}>${guru.nama}</option>`;
+                });
+                guruCell.appendChild(guruSelect);
+                row.appendChild(guruCell);
+                
+                // Kolom Aksi
+                const actionCell = document.createElement('td');
+                const saveBtn = document.createElement('button');
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Simpan';
+                saveBtn.className = 'action-btn save-btn';
+                saveBtn.onclick = () => saveSiswaData(kelas, siswa.id, levelSelect.value, guruSelect.value);
+                
+                const printBtn = document.createElement('button');
+                printBtn.innerHTML = '<i class="fas fa-print"></i> Cetak PDF';
+                printBtn.className = 'action-btn print-btn';
+                printBtn.onclick = () => printLaporan(kelas, siswa.id);
+                
+                actionCell.appendChild(saveBtn);
+                actionCell.appendChild(printBtn);
+                row.appendChild(actionCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Render tabel guru
+        function renderGuruTable() {
+            const tbody = document.getElementById('guruTableBody');
+            tbody.innerHTML = '';
+            
+            guruData.forEach(guru => {
+                const row = document.createElement('tr');
+                
+                // Kolom ID
+                const idCell = document.createElement('td');
+                idCell.textContent = guru.id;
+                row.appendChild(idCell);
+                
+                // Kolom Nama
+                const namaCell = document.createElement('td');
+                const namaInput = document.createElement('input');
+                namaInput.type = 'text';
+                namaInput.value = guru.nama;
+                namaCell.appendChild(namaInput);
+                row.appendChild(namaCell);
+                
+                // Kolom Aksi
+                const actionCell = document.createElement('td');
+                const saveBtn = document.createElement('button');
+                saveBtn.innerHTML = '<i class="fas fa-save"></i> Simpan';
+                saveBtn.className = 'action-btn save-btn';
+                saveBtn.onclick = () => saveGuruData(guru.id, namaInput.value);
+                
+                const viewBtn = document.createElement('button');
+                viewBtn.innerHTML = '<i class="fas fa-eye"></i> Lihat Siswa';
+                viewBtn.className = 'action-btn view-btn';
+                viewBtn.onclick = () => showSiswaByGuru(guru.id, guru.nama);
+                
+                actionCell.appendChild(saveBtn);
+                actionCell.appendChild(viewBtn);
+                row.appendChild(actionCell);
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Simpan data siswa
+        function saveSiswaData(kelas, siswaId, level, guruId) {
+            const siswa = siswaData[kelas].find(s => s.id === siswaId);
+            if (siswa) {
+                siswa.level = parseInt(level);
+                siswa.guruId = parseInt(guruId);
+                saveData();
+                showNotification('Data siswa berhasil disimpan!');
+            }
+        }
+        
+        // Simpan data guru
+        function saveGuruData(guruId, nama) {
+            const guru = guruData.find(g => g.id === guruId);
+            if (guru && nama.trim() !== '') {
+                guru.nama = nama.trim();
+                saveData();
+                showNotification('Data guru berhasil disimpan!');
+            }
+        }
+        
+        // Tampilkan siswa berdasarkan guru
+        function showSiswaByGuru(guruId, guruName) {
+            const modal = document.getElementById('siswaModal');
+            const guruNameElement = document.getElementById('guruName');
+            const siswaCountElement = document.getElementById('siswaCount');
+            const siswaListElement = document.getElementById('siswaList');
+            
+            // Set nama guru di modal
+            guruNameElement.textContent = guruName;
+            
+            // Kosongkan daftar siswa
+            siswaListElement.innerHTML = '';
+            
+            // Cari semua siswa yang dibimbing oleh guru ini
+            let siswaCount = 0;
+            const kelasList = ['2A', '2B', '2C', '2D', '2E', '2F'];
+            
+            kelasList.forEach(kelas => {
+                siswaData[kelas].forEach(siswa => {
+                    if (siswa.guruId === guruId) {
+                        siswaCount++;
+                        
+                        // Buat elemen untuk setiap siswa
+                        const siswaItem = document.createElement('div');
+                        siswaItem.className = 'siswa-item';
+                        
+                        const siswaName = document.createElement('div');
+                        siswaName.className = 'siswa-name';
+                        siswaName.innerHTML = `<i class="fas fa-user-graduate"></i> ${siswa.nama}`;
+                        
+                        const siswaInfo = document.createElement('div');
+                        siswaInfo.className = 'siswa-info';
+                        
+                        const siswaKelas = document.createElement('span');
+                        siswaKelas.innerHTML = `<i class="fas fa-school"></i> Kelas: ${kelas}`;
+                        
+                        const siswaLevel = document.createElement('span');
+                        siswaLevel.className = 'level-badge';
+                        siswaLevel.textContent = `Level ${siswa.level}`;
+                        
+                        siswaInfo.appendChild(siswaKelas);
+                        siswaInfo.appendChild(siswaLevel);
+                        
+                        siswaItem.appendChild(siswaName);
+                        siswaItem.appendChild(siswaInfo);
+                        
+                        siswaListElement.appendChild(siswaItem);
+                    }
+                });
+            });
+            
+            // Update jumlah siswa
+            siswaCountElement.textContent = siswaCount;
+            
+            // Tampilkan modal
+            modal.style.display = 'block';
+        }
+        
+        // Cetak laporan
+        function printLaporan(kelas, siswaId) {
+            const siswa = siswaData[kelas].find(s => s.id === siswaId);
+            if (!siswa) return;
+            
+            const guru = guruData.find(g => g.id === siswa.guruId);
+            
+            document.getElementById('printNamaSiswa').textContent = siswa.nama;
+            document.getElementById('printKelas').textContent = kelas;
+            document.getElementById('printLevel').textContent = siswa.level > 0 ? `Level ${siswa.level}` : 'Belum dinilai';
+            document.getElementById('printGuru').textContent = guru ? guru.nama : 'Belum ditentukan';
+            
+            window.print();
+        }
+        
+        // Generate laporan
+        function generateReport(type) {
+            const reportTitle = document.getElementById('reportTitle');
+            const statsGrid = document.getElementById('statsGrid');
+            const reportTable = document.getElementById('reportTable');
+            
+            // Reset konten
+            statsGrid.innerHTML = '';
+            reportTable.innerHTML = '';
+            
+            let chartData = {
+                labels: [],
+                datasets: [{
+                    label: 'Jumlah Siswa',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(139, 92, 246, 0.7)',
+                        'rgba(236, 72, 153, 0.7)',
+                        'rgba(16, 185, 129, 0.7)',
+                        'rgba(245, 158, 11, 0.7)',
+                        'rgba(239, 68, 68, 0.7)'
+                    ],
+                    borderColor: [
+                        'rgba(59, 130, 246, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(236, 72, 153, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(245, 158, 11, 1)',
+                        'rgba(239, 68, 68, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            
+            // Generate data berdasarkan jenis laporan
+            switch(type) {
+                case 'kelas':
+                    reportTitle.textContent = 'Laporan Progres Per Kelas';
+                    generateReportPerKelas(chartData, statsGrid, reportTable);
+                    break;
+                case 'level':
+                    reportTitle.textContent = 'Laporan Progres Per Level';
+                    generateReportPerLevel(chartData, statsGrid, reportTable);
+                    break;
+                case 'all':
+                    reportTitle.textContent = 'Laporan Progres Seluruh Kelas';
+                    generateReportAll(chartData, statsGrid, reportTable);
+                    break;
+                case 'guru':
+                    reportTitle.textContent = 'Laporan Progres Per Guru Pembimbing';
+                    generateReportPerGuru(chartData, statsGrid, reportTable);
+                    break;
+            }
+            
+            // Render chart
+            const ctx = document.getElementById('reportChart').getContext('2d');
+            const reportChart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#94a3b8'
+                            },
+                            grid: {
+                                color: 'rgba(148, 163, 184, 0.1)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e6ed'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Generate laporan per kelas
+        function generateReportPerKelas(chartData, statsGrid, reportTable) {
+            const kelasList = ['2A', '2B', '2C', '2D', '2E', '2F'];
+            let totalSiswa = 0;
+            let totalLevelized = 0;
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Kelas</th>
+                    <th>Total Siswa</th>
+                    <th>Siswa Dilevelisasi</th>
+                    <th>Persentase</th>
+                    <th>Level 1</th>
+                    <th>Level 2</th>
+                    <th>Level 3</th>
+                </tr>
+            `;
+            reportTable.appendChild(thead);
+            
+            const tbody = document.createElement('tbody');
+            
+            kelasList.forEach(kelas => {
+                const siswaKelas = siswaData[kelas];
+                const total = siswaKelas.length;
+                const levelized = siswaKelas.filter(s => s.level > 0).length;
+                const percentage = total > 0 ? Math.round((levelized / total) * 100) : 0;
+                const level1 = siswaKelas.filter(s => s.level === 1).length;
+                const level2 = siswaKelas.filter(s => s.level === 2).length;
+                const level3 = siswaKelas.filter(s => s.level === 3).length;
+                
+                totalSiswa += total;
+                totalLevelized += levelized;
+                
+                // Add to chart data
+                chartData.labels.push(kelas);
+                chartData.datasets[0].data.push(levelized);
+                
+                // Add to stats grid
+                const statCard = document.createElement('div');
+                statCard.className = 'stat-card';
+                statCard.innerHTML = `
+                    <div class="stat-value">${percentage}%</div>
+                    <div class="stat-label">${kelas}</div>
+                    <div class="percentage-bar">
+                        <div class="percentage-fill" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                statsGrid.appendChild(statCard);
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${kelas}</td>
+                    <td>${total}</td>
+                    <td>${levelized}</td>
+                    <td>${percentage}%</td>
+                    <td>${level1}</td>
+                    <td>${level2}</td>
+                    <td>${level3}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            reportTable.appendChild(tbody);
+            
+            // Add overall stats
+            const overallPercentage = totalSiswa > 0 ? Math.round((totalLevelized / totalSiswa) * 100) : 0;
+            const overallStat = document.createElement('div');
+            overallStat.className = 'stat-card';
+            overallStat.innerHTML = `
+                <div class="stat-value">${overallPercentage}%</div>
+                <div class="stat-label">Seluruh Kelas</div>
+                <div class="percentage-bar">
+                    <div class="percentage-fill" style="width: ${overallPercentage}%"></div>
+                </div>
+            `;
+            statsGrid.appendChild(overallStat);
+        }
+        
+        // Generate laporan per level
+        function generateReportPerLevel(chartData, statsGrid, reportTable) {
+            const kelasList = ['2A', '2B', '2C', '2D', '2E', '2F'];
+            const levelCounts = {1: 0, 2: 0, 3: 0};
+            let totalSiswa = 0;
+            let totalLevelized = 0;
+            
+            // Count students per level
+            kelasList.forEach(kelas => {
+                siswaData[kelas].forEach(siswa => {
+                    totalSiswa++;
+                    if (siswa.level > 0) {
+                        totalLevelized++;
+                        levelCounts[siswa.level]++;
+                    }
+                });
+            });
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Level</th>
+                    <th>Jumlah Siswa</th>
+                    <th>Persentase dari Total</th>
+                    <th>Persentase dari Siswa Dilevelisasi</th>
+                </tr>
+            `;
+            reportTable.appendChild(thead);
+            
+            const tbody = document.createElement('tbody');
+            
+            // Add data for each level
+            for (let level = 1; level <= 3; level++) {
+                const count = levelCounts[level];
+                const percentageTotal = totalSiswa > 0 ? Math.round((count / totalSiswa) * 100) : 0;
+                const percentageLevelized = totalLevelized > 0 ? Math.round((count / totalLevelized) * 100) : 0;
+                
+                // Add to chart data
+                chartData.labels.push(`Level ${level}`);
+                chartData.datasets[0].data.push(count);
+                
+                // Add to stats grid
+                const statCard = document.createElement('div');
+                statCard.className = 'stat-card';
+                statCard.innerHTML = `
+                    <div class="stat-value">${count}</div>
+                    <div class="stat-label">Level ${level}</div>
+                    <div class="percentage-bar">
+                        <div class="percentage-fill" style="width: ${percentageLevelized}%"></div>
+                    </div>
+                `;
+                statsGrid.appendChild(statCard);
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>Level ${level}</td>
+                    <td>${count}</td>
+                    <td>${percentageTotal}%</td>
+                    <td>${percentageLevelized}%</td>
+                `;
+                tbody.appendChild(row);
+            }
+            
+            reportTable.appendChild(tbody);
+            
+            // Add overall stats
+            const overallStat = document.createElement('div');
+            overallStat.className = 'stat-card';
+            overallStat.innerHTML = `
+                <div class="stat-value">${totalLevelized}</div>
+                <div class="stat-label">Total Siswa Dilevelisasi</div>
+            `;
+            statsGrid.appendChild(overallStat);
+        }
+        
+        // Generate laporan seluruh kelas
+        function generateReportAll(chartData, statsGrid, reportTable) {
+            const kelasList = ['2A', '2B', '2C', '2D', '2E', '2F'];
+            let totalSiswa = 0;
+            let totalLevelized = 0;
+            let totalLevel1 = 0;
+            let totalLevel2 = 0;
+            let totalLevel3 = 0;
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Kelas</th>
+                    <th>Total Siswa</th>
+                    <th>Level 1</th>
+                    <th>Level 2</th>
+                    <th>Level 3</th>
+                    <th>Total Dilevelisasi</th>
+                    <th>Persentase</th>
+                </tr>
+            `;
+            reportTable.appendChild(thead);
+            
+            const tbody = document.createElement('tbody');
+            
+            kelasList.forEach(kelas => {
+                const siswaKelas = siswaData[kelas];
+                const total = siswaKelas.length;
+                const level1 = siswaKelas.filter(s => s.level === 1).length;
+                const level2 = siswaKelas.filter(s => s.level === 2).length;
+                const level3 = siswaKelas.filter(s => s.level === 3).length;
+                const levelized = level1 + level2 + level3;
+                const percentage = total > 0 ? Math.round((levelized / total) * 100) : 0;
+                
+                totalSiswa += total;
+                totalLevelized += levelized;
+                totalLevel1 += level1;
+                totalLevel2 += level2;
+                totalLevel3 += level3;
+                
+                // Add to chart data
+                chartData.labels.push(kelas);
+                chartData.datasets[0].data.push(levelized);
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${kelas}</td>
+                    <td>${total}</td>
+                    <td>${level1}</td>
+                    <td>${level2}</td>
+                    <td>${level3}</td>
+                    <td>${levelized}</td>
+                    <td>${percentage}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Add total row
+            const totalRow = document.createElement('tr');
+            totalRow.style.fontWeight = 'bold';
+            totalRow.innerHTML = `
+                <td>SELURUH KELAS</td>
+                <td>${totalSiswa}</td>
+                <td>${totalLevel1}</td>
+                <td>${totalLevel2}</td>
+                <td>${totalLevel3}</td>
+                <td>${totalLevelized}</td>
+                <td>${totalSiswa > 0 ? Math.round((totalLevelized / totalSiswa) * 100) : 0}%</td>
+            `;
+            tbody.appendChild(totalRow);
+            
+            reportTable.appendChild(tbody);
+            
+            // Add stats
+            const overallPercentage = totalSiswa > 0 ? Math.round((totalLevelized / totalSiswa) * 100) : 0;
+            
+            const totalStat = document.createElement('div');
+            totalStat.className = 'stat-card';
+            totalStat.innerHTML = `
+                <div class="stat-value">${totalSiswa}</div>
+                <div class="stat-label">Total Siswa</div>
+            `;
+            statsGrid.appendChild(totalStat);
+            
+            const levelizedStat = document.createElement('div');
+            levelizedStat.className = 'stat-card';
+            levelizedStat.innerHTML = `
+                <div class="stat-value">${totalLevelized}</div>
+                <div class="stat-label">Siswa Dilevelisasi</div>
+            `;
+            statsGrid.appendChild(levelizedStat);
+            
+            const percentageStat = document.createElement('div');
+            percentageStat.className = 'stat-card';
+            percentageStat.innerHTML = `
+                <div class="stat-value">${overallPercentage}%</div>
+                <div class="stat-label">Persentase</div>
+                <div class="percentage-bar">
+                    <div class="percentage-fill" style="width: ${overallPercentage}%"></div>
+                </div>
+            `;
+            statsGrid.appendChild(percentageStat);
+        }
+        
+        // Generate laporan per guru
+        function generateReportPerGuru(chartData, statsGrid, reportTable) {
+            let totalSiswa = 0;
+            let totalLevelized = 0;
+            
+            // Create table header
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+                <tr>
+                    <th>Guru</th>
+                    <th>Jumlah Siswa Bimbingan</th>
+                    <th>Level 1</th>
+                    <th>Level 2</th>
+                    <th>Level 3</th>
+                    <th>Persentase Dilevelisasi</th>
+                </tr>
+            `;
+            reportTable.appendChild(thead);
+            
+            const tbody = document.createElement('tbody');
+            
+            guruData.forEach(guru => {
+                const kelasList = ['2A', '2B', '2C', '2D', '2E', '2F'];
+                let siswaCount = 0;
+                let level1 = 0;
+                let level2 = 0;
+                let level3 = 0;
+                
+                kelasList.forEach(kelas => {
+                    siswaData[kelas].forEach(siswa => {
+                        if (siswa.guruId === guru.id) {
+                            siswaCount++;
+                            totalSiswa++;
+                            if (siswa.level > 0) {
+                                totalLevelized++;
+                                if (siswa.level === 1) level1++;
+                                else if (siswa.level === 2) level2++;
+                                else if (siswa.level === 3) level3++;
+                            }
+                        }
+                    });
+                });
+                
+                const levelized = level1 + level2 + level3;
+                const percentage = siswaCount > 0 ? Math.round((levelized / siswaCount) * 100) : 0;
+                
+                // Add to chart data
+                chartData.labels.push(guru.nama);
+                chartData.datasets[0].data.push(siswaCount);
+                
+                // Add to stats grid
+                const statCard = document.createElement('div');
+                statCard.className = 'stat-card';
+                statCard.innerHTML = `
+                    <div class="stat-value">${siswaCount}</div>
+                    <div class="stat-label">${guru.nama}</div>
+                    <div class="percentage-bar">
+                        <div class="percentage-fill" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                statsGrid.appendChild(statCard);
+                
+                // Add to table
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${guru.nama}</td>
+                    <td>${siswaCount}</td>
+                    <td>${level1}</td>
+                    <td>${level2}</td>
+                    <td>${level3}</td>
+                    <td>${percentage}%</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            reportTable.appendChild(tbody);
+            
+            // Add overall stats
+            const overallPercentage = totalSiswa > 0 ? Math.round((totalLevelized / totalSiswa) * 100) : 0;
+            
+            const totalStat = document.createElement('div');
+            totalStat.className = 'stat-card';
+            totalStat.innerHTML = `
+                <div class="stat-value">${totalSiswa}</div>
+                <div class="stat-label">Total Siswa</div>
+            `;
+            statsGrid.appendChild(totalStat);
+            
+            const percentageStat = document.createElement('div');
+            percentageStat.className = 'stat-card';
+            percentageStat.innerHTML = `
+                <div class="stat-value">${overallPercentage}%</div>
+                <div class="stat-label">Persentase Dilevelisasi</div>
+                <div class="percentage-bar">
+                    <div class="percentage-fill" style="width: ${overallPercentage}%"></div>
+                </div>
+            `;
+            statsGrid.appendChild(percentageStat);
+        }
+        
+        // Export laporan ke PDF
+        function exportReportPDF() {
+            const element = document.getElementById('reportContent');
+            const opt = {
+                margin: 10,
+                filename: `Laporan_Progres_${new Date().toISOString().split('T')[0]}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+            
+            html2pdf().set(opt).from(element).save();
+            showNotification('Laporan berhasil diexport ke PDF!');
+        }
+        
+        // Inisialisasi aplikasi
+        window.onload = function() {
+            loadData();
+            
+            // Setup modal close button
+            const modal = document.getElementById('siswaModal');
+            const span = document.getElementsByClassName('close')[0];
+            
+            span.onclick = function() {
+                modal.style.display = 'none';
+            }
+            
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            }
+            
+            // Efek animasi untuk tombol utama
+            const menuButtons = document.querySelectorAll('.menu-btn');
+            menuButtons.forEach((btn, index) => {
+                setTimeout(() => {
+                    btn.classList.add('pulse');
+                    setTimeout(() => {
+                        btn.classList.remove('pulse');
+                    }, 2000);
+                }, index * 200);
+            });
+        };
+    </script>
+</body>
+</html>
